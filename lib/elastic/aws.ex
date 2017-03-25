@@ -22,7 +22,7 @@ defmodule Elastic.AWS do
   end
 
   #AWSAuth.sign_authorization_header(access_key, secret_key, http_method, url, region, service, headers, payload)
-  def auth_headers(method, url, headers, body) do
+  def auth_headers(method, url, headers, body, request_time) do
     current_settings = settings()
     Logger.info("#{__MODULE__} HEADERS: #{inspect headers}")
     Logger.info("#{__MODULE__} PROCESSED HEADERS: #{inspect process_headers(method, headers)}")
@@ -35,7 +35,7 @@ defmodule Elastic.AWS do
       "es",
       process_headers(method, headers),
       body,
-      DateTime.utc_now |> DateTime.to_naive
+      request_time
     )
   end
 
