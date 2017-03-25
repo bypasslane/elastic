@@ -85,12 +85,12 @@ defmodule Elastic.HTTP do
     Logger.debug("Elastic bulk options: #{inspect options}")
     body = Keyword.get(options, :body, "") <> "\n"
     options = Keyword.put(options, :body, body)
-    headers = Keyword.get(options, :headers, []) |> sign_headers(:post, "_bulk", body)
-    url = build_url(:post, "_bulk", headers, body)
+    url = build_url(:post, "_bulk", [], body)
+    headers = Keyword.get(options, :headers, []) |> sign_headers(:post, url, body)
     Logger.info("Elastic bulk call: #{inspect url}")
     Logger.info("Elastic bulk headers: #{inspect headers}")
     Logger.debug("Elastic bulk body: #{inspect body}")
-    HTTPotion.post(url, options) |> process_response
+    HTTPotion.post(url, options, headers) |> process_response
   end
 
   defp base_url do
