@@ -33,6 +33,7 @@ defmodule Elastic.AWS do
       process_headers(method, headers),
       body,
       DateTime.utc_now |> DateTime.to_naive
+    )
   end
 
   # DELETE requests do not support headers
