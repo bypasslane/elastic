@@ -86,7 +86,7 @@ defmodule Elastic.HTTP do
     request_time = DateTime.utc_now |> DateTime.to_naive
     body = Keyword.get(options, :body, "") <> "\n"
     url = build_url("_bulk")
-    headers = Keyword.get(options, :headers, %{"x-amz-date": format_time(request_time)})
+    headers = Keyword.get(options, :headers, %{})
       |> sign_headers(:post, url, body, request_time)
       |> Keyword.new(fn({k, v}) -> {String.to_atom(k), v} end)
     Logger.info("Elastic bulk call: #{inspect url}")
@@ -132,7 +132,9 @@ defmodule Elastic.HTTP do
   defp sign_headers(headers, method, url, body, request_time) do
     Logger.info("Elastic bulk headers: #{inspect headers}")
     if AWS.enabled? do
-      Map.put_new(headers, "Authorization", AWS.auth_headers(method, url, headers, body, request_time))
+      headers
+        |> Map.put_new("x-amz-date", format_time(request_time))
+        |> Map.put_new("Authorization", AWS.auth_headers(method, url, headers, body, request_time))
     else
       headers
     end
