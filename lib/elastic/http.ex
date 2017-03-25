@@ -82,7 +82,7 @@ defmodule Elastic.HTTP do
   end
 
   def bulk(options) do
-    Logger.info("Elastic bulk options: #{inspect options}")
+    Logger.debug("Elastic bulk options: #{inspect options}")
     body = Keyword.get(options, :body, "") <> "\n"
     options = Keyword.put(options, :body, body)
     headers = Keyword.get(options, :headers, []) |> sign_headers(:post, "_bulk", body)
@@ -119,6 +119,7 @@ defmodule Elastic.HTTP do
   end
 
   defp sign_headers(headers, method, url, body) do
+    Logger.info("Elastic bulk headers: #{inspect headers}")
     if AWS.enabled? do
       [{"Authorization", AWS.auth_headers(method, url, headers, body)} | headers ]
     else
