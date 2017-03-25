@@ -115,6 +115,11 @@ defmodule Elastic.HTTP do
     []
   end
 
+  defp encode_body(body) do
+    {:ok, encoded_body} = Poison.encode(body)
+    encoded_body
+  end
+
   defp format_time(time) do
     time
       |> NaiveDateTime.to_iso8601
@@ -124,15 +129,12 @@ defmodule Elastic.HTTP do
       |> String.replace(":", "")
   end
 
-  defp encode_body(body) do
-    {:ok, encoded_body} = Poison.encode(body)
-    encoded_body
-  end
-
   defp sign_headers(headers, method, url, body, request_time) do
     Logger.info("Elastic bulk headers: #{inspect headers}")
+    uri = URI.parse(url)
     if AWS.enabled? do
       headers_with_time = Map.put_new(headers, "x-amz-date", format_time(request_time))
+        |> Map.put_new(headers, "host", uri.host)
       Logger.info("Elastic bulk headers with time: #{inspect headers_with_time}")
       authentication_headers = AWS.auth_headers(method, url, headers_with_time, body, request_time)
       Logger.info("Elastic bulk authentication headers: #{inspect authentication_headers}")
@@ -145,7 +147,7 @@ defmodule Elastic.HTTP do
   end
 
   defp build_url(url) do
-    url = URI.merge(base_url(), url)
+    URI.merge(base_url(), url)
   end
   defp build_url(method, url, headers, body) do
     url = URI.merge(base_url(), url)
