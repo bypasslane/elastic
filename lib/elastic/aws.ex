@@ -23,6 +23,7 @@ defmodule Elastic.AWS do
 
   #AWSAuth.sign_authorization_header(access_key, secret_key, http_method, url, region, service, headers, payload)
   def auth_headers(method, url, headers, body) do
+    current_settings = settings()
     AWSAuth.sign_authorization_header(
       current_settings.access_key_id,
       current_settings.secret_access_key,

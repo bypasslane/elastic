@@ -86,7 +86,7 @@ defmodule Elastic.HTTP do
     body = Keyword.get(options, :body, "") <> "\n"
     options = Keyword.put(options, :body, body)
     headers = Keyword.get(options, :headers, []) |> sign_headers(:post, "_bulk", body)
-    url = vbuild_url(:post, "_bulk", headers, body)
+    url = build_url(:post, "_bulk", headers, body)
     Logger.info("Elastic bulk call: #{inspect url}")
     Logger.info("Elastic bulk headers: #{inspect headers}")
     Logger.debug("Elastic bulk body: #{inspect body}")
@@ -119,9 +119,11 @@ defmodule Elastic.HTTP do
   end
 
   defp sign_headers(headers, method, url, body) do
-    if AWS.enabled?,
-      do:  [{"Authorization", AWS.auth_headers(method, url, headers, body)} | headers ]}
-      else: headers
+    if AWS.enabled? do
+      [{"Authorization", AWS.auth_headers(method, url, headers, body)} | headers ]
+    else
+      headers
+    end
   end
 
   defp build_url(method, url, headers, body) do
