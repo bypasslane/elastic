@@ -100,7 +100,7 @@ defmodule Elastic.HTTP do
   defp request(method, url, options) do
     body = Keyword.get(options, :body, []) |> encode_body
     options = Keyword.put(options, :body, body)
-    headers = Keyword.get(options, :headers, [])
+    headers = Keyword.get(options, :headers, %{})
     url = build_url(method, url, headers, body)
     apply(HTTPotion, method, [url, options]) |> process_response
   end
@@ -121,7 +121,7 @@ defmodule Elastic.HTTP do
   defp sign_headers(headers, method, url, body) do
     Logger.info("Elastic bulk headers: #{inspect headers}")
     if AWS.enabled? do
-      [{"Authorization", AWS.auth_headers(method, url, headers, body)} | headers ]
+      Map.put_new(headers, "Authorization", AWS.auth_headers(method, url, headers, body))
     else
       headers
     end
