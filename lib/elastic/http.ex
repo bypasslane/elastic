@@ -85,8 +85,8 @@ defmodule Elastic.HTTP do
     Logger.debug("Elastic bulk options: #{inspect options}")
     body = Keyword.get(options, :body, "") <> "\n"
     options = Keyword.put(options, :body, body)
-    url = build_url(:post, "_bulk", [], body)
-    headers = Keyword.get(options, :headers, []) |> sign_headers(:post, url, body)
+    url = build_url("_bulk")
+    headers = Keyword.get(options, :headers, %{}) |> sign_headers(:post, url, body)
     Logger.info("Elastic bulk call: #{inspect url}")
     Logger.info("Elastic bulk headers: #{inspect headers}")
     Logger.debug("Elastic bulk body: #{inspect body}")
@@ -127,10 +127,13 @@ defmodule Elastic.HTTP do
     end
   end
 
+  defp build_url(url) do
+    url = URI.merge(base_url(), url)
+  end
   defp build_url(method, url, headers, body) do
     url = URI.merge(base_url(), url)
-    # if AWS.enabled?,
-    #   do: AWS.sign_url(method, url, headers, body),
-    #   else: url
+    if AWS.enabled?,
+      do: AWS.sign_url(method, url, headers, body),
+      else: url
   end
 end
