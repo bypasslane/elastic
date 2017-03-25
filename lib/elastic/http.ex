@@ -132,9 +132,13 @@ defmodule Elastic.HTTP do
   defp sign_headers(headers, method, url, body, request_time) do
     Logger.info("Elastic bulk headers: #{inspect headers}")
     if AWS.enabled? do
-      headers
-        |> Map.put_new("x-amz-date", format_time(request_time))
-        |> Map.put_new("Authorization", AWS.auth_headers(method, url, headers, body, request_time))
+      headers_with_time = Map.put_new(headers, "x-amz-date", format_time(request_time))
+      Logger.info("Elastic bulk headers with time: #{inspect headers_with_time}")
+      authentication_headers = AWS.auth_headers(method, url, headers_with_time, body, request_time)
+      Logger.info("Elastic bulk authentication headers: #{inspect authentication_headers}")
+      result =  Map.put_new(headers_with_time, "Authorization", authentication_headers)
+      Logger.info("Elastic bulk headers result: #{inspect result}")
+      result
     else
       headers
     end
