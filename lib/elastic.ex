@@ -39,6 +39,25 @@ defmodule Elastic do
   """
 
   def base_url do
-    Application.get_env(:elastic, :base_url)
+    get_setting(:elastic, :base_url)
+  end
+
+  defp get_setting(app, key, default \\ nil) when is_atom(app) and is_atom(key) do
+    case Application.get_env(app, key) do
+      {:system, env_var} ->
+        case System.get_env(env_var) do
+          nil -> default
+          val -> val
+        end
+      {:system, env_var, preconfigured_default} ->
+        case System.get_env(env_var) do
+          nil -> preconfigured_default
+          val -> val
+        end
+      nil ->
+        default
+      val ->
+        val
+    end
   end
 end
