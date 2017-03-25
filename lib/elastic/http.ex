@@ -134,7 +134,7 @@ defmodule Elastic.HTTP do
     uri = URI.parse(url)
     if AWS.enabled? do
       headers_with_time = Map.put_new(headers, "x-amz-date", format_time(request_time))
-        |> Map.put_new(headers, "host", uri.host)
+        |> Map.put_new("host", uri.host)
       Logger.info("Elastic bulk headers with time: #{inspect headers_with_time}")
       authentication_headers = AWS.auth_headers(method, url, headers_with_time, body, request_time)
       Logger.info("Elastic bulk authentication headers: #{inspect authentication_headers}")
