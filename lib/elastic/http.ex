@@ -1,4 +1,5 @@
 defmodule Elastic.HTTP do
+  require Logger
   alias Elastic.AWS
   @moduledoc ~S"""
   Used to make raw calls to Elastic Search.
@@ -85,6 +86,10 @@ defmodule Elastic.HTTP do
     body = Keyword.get(options, :body, "") <> "\n"
     options = Keyword.put(options, :body, body)
     url = build_url(:post, "_bulk", headers, body)
+    Logger.info("Elastic bulk call: #{inspect url}")
+    Logger.info("Elastic bulk options: #{inspect options}")
+    Logger.info("Elastic bulk headers: #{inspect headers}")
+    Logger.debug("Elastic bulk body: #{inspect body}")
     HTTPotion.post(url, options) |> process_response
   end
 
